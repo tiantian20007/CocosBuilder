@@ -228,6 +228,11 @@
         BOOL usingDefaultValue = NO;
         id serializedValue = NULL;
         
+        BOOL useFlashSkews = [[CocosBuilderAppDelegate appDelegate] currentDocumentUsesFlashSkew];
+        if (useFlashSkews && [name isEqualToString:@"rotation"]) continue;
+        if (!useFlashSkews && [name isEqualToString:@"rotationX"]) continue;
+        if (!useFlashSkews && [name isEqualToString:@"rotationY"]) continue;
+        
         // Check if this property should be excluded
         if (excludeProps && [excludeProps indexOfObject:name] != NSNotFound)
         {
@@ -279,7 +284,7 @@
             
             usingDefaultValue = [CCBWriterInternal isEqualNumberArray:serializedValue comparison:defaultSerialization];
         }
-        else if ([type isEqualToString:@"Scale"])
+        else if ([type isEqualToString:@"FloatXY"])
         {
             float x = [[node valueForKey:[NSString stringWithFormat:@"%@X",name]] floatValue];
             float y = [[node valueForKey:[NSString stringWithFormat:@"%@Y",name]] floatValue];
