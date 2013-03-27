@@ -517,7 +517,7 @@
         }
     }
     
-    if (isGeneratedSpriteSheet)
+    if (isGeneratedSpriteSheet && NO)
     {
         // Sprite files should have been saved to the temp cache directory, now actually generate the sprite sheets
         NSString* spriteSheetDir = [outDir stringByDeletingLastPathComponent];
