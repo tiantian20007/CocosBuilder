@@ -57,7 +57,7 @@
     warnings = [w retain];
     
     // Setup extensions to copy
-    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg",@"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf",@"js",@"wav",@"mp3",@"m4a",@"caf", nil];
+    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg",@"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf",@"js", @"json", @"wav",@"mp3",@"m4a",@"caf", nil];
     
     // Set format to use for exports
     self.publishFormat = projectSettings.exporter;
@@ -745,6 +745,7 @@
         
         tmpl = [CCBPublisherTemplate templateWithFile:@"boot2-html5.txt"];
         [tmpl setString:projectSettings.javascriptMainCCB forMarker:@"MAIN_SCENE"];
+        [tmpl setString:[NSString stringWithFormat:@"%d", projectSettings.publishResolutionHTML5_scale] forMarker:@"RESOLUTION_SCALE"];
         
         [tmpl writeToFile:boot2File];
         
@@ -892,6 +893,22 @@
 
 - (BOOL) publish_
 {
+    // Remove all old publish directories if user has cleaned the cache
+    if (projectSettings.needRepublish)
+    {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        NSString* publishDir;
+        
+        publishDir = [projectSettings.publishDirectory absolutePathFromBaseDirPath:[projectSettings.projectPath stringByDeletingLastPathComponent]];
+        [fm removeItemAtPath:publishDir error:NULL];
+        
+        publishDir = [projectSettings.publishDirectoryAndroid absolutePathFromBaseDirPath:[projectSettings.projectPath stringByDeletingLastPathComponent]];
+        [fm removeItemAtPath:publishDir error:NULL];
+        
+        publishDir = [projectSettings.publishDirectoryHTML5 absolutePathFromBaseDirPath:[projectSettings.projectPath stringByDeletingLastPathComponent]];
+        [fm removeItemAtPath:publishDir error:NULL];
+    }
+    
     if (!runAfterPublishing)
     {
         // Normal publishing
@@ -1014,61 +1031,85 @@
     }
     else
     {
-        // Publish for running on device
-        targetType = kCCBPublisherTargetTypeIPhone;
-        
-        PlayerDeviceInfo* deviceInfo = [PlayerConnection sharedPlayerConnection].selectedDeviceInfo;
-        if ([deviceInfo.deviceType isEqualToString:@"iPad"])
+        if (browser)
         {
-            // iPad
-            if (deviceInfo.hasRetinaDisplay)
-            {
-                // iPad retina
-                publishForResolutions = [NSArray arrayWithObjects:@"ipadhd", nil];
-            }
-            else
-            {
-                // iPad normal
-                publishForResolutions = [NSArray arrayWithObjects:@"ipad", @"hd", nil];
-            }
-        }
-        else if ([deviceInfo.deviceType isEqualToString:@"iPhone"])
-        {
-            // iPhone
-            if (deviceInfo.hasRetinaDisplay)
-            {
-                publishForResolutions = [NSArray arrayWithObjects:@"iphonehd", nil];
-            }
-            else
-            {
-                publishForResolutions = [NSArray arrayWithObjects:@"iphone", nil];
-            }
-        }
-        else if ([deviceInfo.deviceType isEqualToString:@"Android"])
-        {
-            targetType = kCCBPublisherTargetTypeAndroid;
+            // Publish for running in browser
+            targetType = kCCBPublisherTargetTypeHTML5;
             
-            publishForResolutions = [NSArray arrayWithObjects:deviceInfo.preferredResourceType, nil];
+            NSMutableArray* resolutions = [NSMutableArray array];
+            [resolutions addObject: @"html5"];
+            publishForResolutions = resolutions;
+            
+            publishToSingleResolution = YES;
+            
+            NSString* publishDir = [projectSettings.publishDirectoryHTML5 absolutePathFromBaseDirPath:[projectSettings.projectPath stringByDeletingLastPathComponent]];
+            
+            if (![self publishAllToDirectory:publishDir]) return NO;
         }
-        
-        if (![self publishAllToDirectory:projectSettings.publishCacheDirectory]) return NO;
-        
-        // Zip up and push
-        CocosBuilderAppDelegate* ad = [CocosBuilderAppDelegate appDelegate];
-        [ad modalStatusWindowUpdateStatusText:@"Zipping up project..."];
-        
-        // Archive
-        NSString *zipFile = [projectSettings.publishCacheDirectory stringByAppendingPathComponent:@"ccb.zip"];
-        [self archiveToFile:zipFile diffFrom:deviceInfo.fileList];
-        // TODO: Fix diffFrom
-        
-        // Send to player
-        [ad modalStatusWindowUpdateStatusText:@"Sending to player..."];
-        
-        PlayerConnection* conn = [PlayerConnection sharedPlayerConnection];
-        [conn sendResourceZip:zipFile];
+        else
+        {
+            // Publish for running on device
+            targetType = kCCBPublisherTargetTypeIPhone;
+            
+            PlayerDeviceInfo* deviceInfo = [PlayerConnection sharedPlayerConnection].selectedDeviceInfo;
+            if ([deviceInfo.deviceType isEqualToString:@"iPad"])
+            {
+                // iPad
+                if (deviceInfo.hasRetinaDisplay)
+                {
+                    // iPad retina
+                    publishForResolutions = [NSArray arrayWithObjects:@"ipadhd", nil];
+                }
+                else
+                {
+                    // iPad normal
+                    publishForResolutions = [NSArray arrayWithObjects:@"ipad", @"hd", nil];
+                }
+            }
+            else if ([deviceInfo.deviceType isEqualToString:@"iPhone"])
+            {
+                // iPhone
+                if (deviceInfo.hasRetinaDisplay)
+                {
+                    publishForResolutions = [NSArray arrayWithObjects:@"iphonehd", nil];
+                }
+                else
+                {
+                    publishForResolutions = [NSArray arrayWithObjects:@"iphone", nil];
+                }
+            }
+            else if ([deviceInfo.deviceType isEqualToString:@"Android"])
+            {
+                targetType = kCCBPublisherTargetTypeAndroid;
+                
+                publishForResolutions = [NSArray arrayWithObjects:deviceInfo.preferredResourceType, nil];
+            }
+            
+            if (![self publishAllToDirectory:projectSettings.publishCacheDirectory]) return NO;
+            
+            // Zip up and push
+            CocosBuilderAppDelegate* ad = [CocosBuilderAppDelegate appDelegate];
+            [ad modalStatusWindowUpdateStatusText:@"Zipping up project..."];
+            
+            // Archive
+            NSString *zipFile = [projectSettings.publishCacheDirectory stringByAppendingPathComponent:@"ccb.zip"];
+            [self archiveToFile:zipFile diffFrom:deviceInfo.fileList];
+            // TODO: Fix diffFrom
+            
+            // Send to player
+            [ad modalStatusWindowUpdateStatusText:@"Sending to player..."];
+            
+            PlayerConnection* conn = [PlayerConnection sharedPlayerConnection];
+            [conn sendResourceZip:zipFile];
+        }
     }
     
+    // Once published, set needRepublish back to NO
+    if (projectSettings.needRepublish)
+    {
+        projectSettings.needRepublish = NO;
+        [projectSettings store];
+    }
     return YES;
 }
 
