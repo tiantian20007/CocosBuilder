@@ -530,7 +530,7 @@
         }
     }
     
-    if (isGeneratedSpriteSheet && NO)
+    if (isGeneratedSpriteSheet)
     {
         // Sprite files should have been saved to the temp cache directory, now actually generate the sprite sheets
         NSString* spriteSheetDir = [outDir stringByDeletingLastPathComponent];
@@ -545,9 +545,16 @@
                                 projectSettings.tempSpriteSheetCacheDirectory,
                                 nil];
             
+            //NSLog(@"srcDirs:");
+            
             NSString* spriteSheetFile = NULL;
             if (publishToSingleResolution) spriteSheetFile = outDir;
             else spriteSheetFile = [[spriteSheetDir stringByAppendingPathComponent:[NSString stringWithFormat:@"resources-%@", res]] stringByAppendingPathComponent:spriteSheetName];
+            
+            NSString* realDir = spriteSheetDir;
+            if (!publishToSingleResolution)
+                realDir = [spriteSheetDir stringByAppendingPathComponent:[NSString stringWithFormat:@"resources-%@", res]];
+            NSLog(@"realDir: %@", realDir);
             
             // Skip publish if sprite sheet exists and is up to date
             NSDate* dstDate = [CCBFileUtil modificationDateForFile:[spriteSheetFile stringByAppendingPathExtension:@"plist"]];
@@ -555,7 +562,8 @@
             {
                 continue;
             }
-                        
+            
+            /*
             Tupac* packer = [Tupac tupac];
             packer.outputName = spriteSheetFile;
             packer.outputFormat = TupacOutputFormatCocos2D;
@@ -578,15 +586,28 @@
                 packer.compress = NO;
                 packer.dither = ssSettings.ditherHTML5;
             }
+            */
             
             // Update progress
             [ad modalStatusWindowUpdateStatusText:[NSString stringWithFormat:@"Generating sprite sheet %@...", [[subPath stringByAppendingPathExtension:@"plist"] lastPathComponent]]];
             
+            // texturePacker task to generate plist
+            if ([res isEqualToString:@"iphonehd"])
+                [self generateSpriteSheet:spriteSheetFile dir:dir maxSize:2048 scale:0];
+            else if ([res isEqualToString:@"iphone"])
+                [self generateSpriteSheet:spriteSheetFile dir:dir maxSize:1024 scale:0.5];
+            
+            
+            // python task to normalize plist
+            [self normalizePlist:realDir mode:@"1"];
+            
             // Pack texture
+            /*
             packer.directoryPrefix = subPath;
             packer.border = YES;
             [packer createTextureAtlasFromDirectoryPaths:srcDirs];
-            
+            */
+             
             // Set correct modification date
             [CCBFileUtil setModificationDate:srcSpriteSheetDate forFile:[spriteSheetFile stringByAppendingPathExtension:@"plist"]];
         }
@@ -601,6 +622,64 @@
     }
     
     return YES;
+}
+
+- (void) generateSpriteSheet: (NSString *)spriteSheetFile dir:(NSString *)dir maxSize:(NSInteger)size scale:(float)scale
+{
+    NSTask *texturePackerTask = [[NSTask alloc] init];
+    [texturePackerTask setLaunchPath:@"/usr/local/bin/TexturePacker"];
+    NSMutableArray *args = [NSMutableArray arrayWithObjects:@"--format", @"cocos2d", nil];
+    
+    [args addObject:@"--data"];
+    [args addObject:[NSString stringWithFormat:@"%@.plist", spriteSheetFile]];
+    
+    [args addObject:@"--sheet"];
+    [args addObject:[NSString stringWithFormat:@"%@.pvr.ccz", spriteSheetFile]];
+    
+    NSString *maxSize = [NSString stringWithFormat:@"%ld", (long)size];
+    
+    NSArray *subArgs = [NSArray arrayWithObjects:@"--texture-format", @"pvr2ccz",
+                        @"--max-width", maxSize,
+                        @"--max-height", maxSize,
+                        @"--size-constraints", @"NPOT",
+                        @"--opt", @"RGBA4444",
+                        @"--dither-none-nn",
+                        @"--pack-mode", @"Best",
+                        @"--scale-mode", @"Smooth",
+                        @"--algorithm", @"MaxRects",
+                        @"--maxrects-heuristics", @"Best",
+                        @"--border-padding", @"2",
+                        @"--shape-padding", @"2",
+                        @"--enable-rotation",
+                        @"--trim-mode", @"Trim", nil];
+    [args addObjectsFromArray:subArgs];
+    if (scale) {
+        NSString *scaleStr = [NSString stringWithFormat:@"%f", scale];
+        [args addObject:@"--scale"];
+        [args addObject:scaleStr];
+    }
+    
+    // last arg is source path
+    NSString *sourcePath = [NSString stringWithFormat:@"%@/resources-auto/", dir];
+    NSLog(@"sp: %@", sourcePath);
+    [args addObject:sourcePath];
+    
+    [texturePackerTask setArguments:args];
+    [texturePackerTask launch];
+    [texturePackerTask waitUntilExit];
+    [texturePackerTask release];
+}
+
+- (void) normalizePlist:(NSString *)srcDir mode:(NSString *)mode
+{
+    NSTask *pythonTask = [[NSTask alloc] init];
+    [pythonTask setLaunchPath:@"/usr/local/bin/python3"];
+    NSMutableArray *pArgs = [NSMutableArray arrayWithObjects:@"/Users/leshu-2/Documents/repository/leshu/SJSG/shared/plist_normalize.py", srcDir, mode, nil];
+    
+    [pythonTask setArguments:pArgs];
+    [pythonTask launch];
+    [pythonTask waitUntilExit];
+    [pythonTask release];
 }
 
 - (BOOL) containsCCBFile:(NSString*) dir
