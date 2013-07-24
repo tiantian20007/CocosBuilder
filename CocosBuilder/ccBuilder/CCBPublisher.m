@@ -675,7 +675,8 @@
 {
     NSTask *pythonTask = [[NSTask alloc] init];
     [pythonTask setLaunchPath:@"/usr/local/bin/python3"];
-    NSMutableArray *pArgs = [NSMutableArray arrayWithObjects:@"/Users/leshu-2/Documents/repository/leshu/SJSG/shared/plist_normalize.py", srcDir, mode, nil];
+    NSString *pythonPath = [NSString stringWithFormat:@"%@/plist_normalize.py", [[projectSettings.projectPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]];
+    NSMutableArray *pArgs = [NSMutableArray arrayWithObjects:pythonPath, srcDir, mode, nil];
     
     [pythonTask setArguments:pArgs];
     [pythonTask launch];
