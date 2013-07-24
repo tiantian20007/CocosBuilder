@@ -593,9 +593,9 @@
             
             // texturePacker task to generate plist
             if ([res isEqualToString:@"iphonehd"])
-                [self generateSpriteSheet:spriteSheetFile dir:dir maxSize:2048 scale:0];
+                [self generateSpriteSheet:spriteSheetFile dir:[srcDirs objectAtIndex:0] maxSize:2048 scale:0];
             else if ([res isEqualToString:@"iphone"])
-                [self generateSpriteSheet:spriteSheetFile dir:dir maxSize:1024 scale:0.5];
+                [self generateSpriteSheet:spriteSheetFile dir:[srcDirs objectAtIndex:0] maxSize:1024 scale:0.5];
             
             
             // python task to normalize plist
@@ -660,9 +660,10 @@
     }
     
     // last arg is source path
-    NSString *sourcePath = [NSString stringWithFormat:@"%@/resources-auto/", dir];
-    NSLog(@"sp: %@", sourcePath);
-    [args addObject:sourcePath];
+    //NSString *sourcePath = [NSString stringWithFormat:@"%@/resources-auto/", dir];
+    NSString *sourcePath = dir;
+    NSLog(@"texturePacker sp: %@", sourcePath);
+    [args addObject:dir];
     
     [texturePackerTask setArguments:args];
     [texturePackerTask launch];
