@@ -57,7 +57,7 @@
     warnings = [w retain];
     
     // Setup extensions to copy
-    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg",@"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf",@"js", @"json", @"wav",@"mp3",@"m4a",@"caf",@"tmx", nil];
+    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg",@"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf",@"jsc", @"json", @"wav",@"mp3",@"m4a",@"caf",@"tmx", nil];
     
     // Set format to use for exports
     self.publishFormat = projectSettings.exporter;
@@ -424,7 +424,7 @@
             
             // Copy files
             for (NSString* ext in copyExtensions)
-            {
+            {                
                 // Skip non png files for generated sprite sheets
                 if (isGeneratedSpriteSheet && ![ext isEqualToString:@"png"]) continue;
                 
@@ -677,6 +677,24 @@
     [pythonTask setLaunchPath:@"/usr/local/bin/python3"];
     NSString *pythonPath = [NSString stringWithFormat:@"%@/plist_normalize.py", [[projectSettings.projectPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]];
     NSMutableArray *pArgs = [NSMutableArray arrayWithObjects:pythonPath, srcDir, mode, nil];
+    
+    [pythonTask setArguments:pArgs];
+    [pythonTask launch];
+    [pythonTask waitUntilExit];
+    [pythonTask release];
+}
+
+- (void) jsCompile:(NSString *)srcDir desDir:(NSString *)desDir
+{
+    NSTask *pythonTask = [[NSTask alloc] init];
+    [pythonTask setLaunchPath:@"/opt/local/bin/python2.7"];
+    NSString *pythonPath = [NSString stringWithFormat:@"%@/libs/cocos2d-x/tools/cocos2d-console/console/cocos2d.py", [[[projectSettings.projectPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]];
+    
+    NSLog(@"cocos2d-console: %@", pythonPath);
+    NSLog(@"srcDir: %@", srcDir);
+    NSLog(@"desDir: %@", desDir);
+    
+    NSMutableArray *pArgs = [NSMutableArray arrayWithObjects:pythonPath, @"jscompile", @"-s", srcDir, @"-d", desDir, nil];
     
     [pythonTask setArguments:pArgs];
     [pythonTask launch];
@@ -993,6 +1011,13 @@
     if (!runAfterPublishing)
     {
         // Normal publishing
+        
+        // js compile to jsc
+        NSString* jsSrcDir = [NSString stringWithFormat:@"%@/javascript", [projectSettings.projectPath stringByDeletingLastPathComponent]];
+        NSString* jscDesDir = [NSString stringWithFormat:@"%@/jsc", [projectSettings.projectPath stringByDeletingLastPathComponent]];
+        //NSLog(@"jsDir: %@", jsSrcDir);
+        //NSLog(@"jsDesDir: %@", jscDesDir);
+        [self jsCompile:jsSrcDir desDir:jscDesDir];
         
         // iOS
         if (projectSettings.publishEnablediPhone)
