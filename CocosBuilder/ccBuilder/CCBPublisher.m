@@ -636,22 +636,120 @@
     [args addObject:@"--sheet"];
     [args addObject:[NSString stringWithFormat:@"%@.pvr.ccz", spriteSheetFile]];
     
-    NSString *maxSize = [NSString stringWithFormat:@"%ld", (long)size];
+    //NSString *maxSize = [NSString stringWithFormat:@"%ld", (long)size];
     
-    NSArray *subArgs = [NSArray arrayWithObjects:@"--texture-format", @"pvr2ccz",
-                        @"--max-width", maxSize,
-                        @"--max-height", maxSize,
-                        @"--size-constraints", @"NPOT",
-                        @"--opt", @"RGBA4444",
-                        @"--dither-none-nn",
-                        @"--pack-mode", @"Best",
-                        @"--scale-mode", @"Smooth",
-                        @"--algorithm", @"MaxRects",
-                        @"--maxrects-heuristics", @"Best",
-                        @"--border-padding", @"2",
-                        @"--shape-padding", @"2",
-                        @"--enable-rotation",
-                        @"--trim-mode", @"Trim", nil];
+    
+    NSString *filePath = [NSString stringWithFormat:@"%@/generate.plist", [[projectSettings.projectPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]];
+    
+    NSArray *subArgs = nil;
+    
+    // read from file, the setting sequence is: charactor, effect, ui...
+    NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:filePath];
+    
+    // if file not exist, generate with the default setting and write setting to file...
+    if (dict == nil)
+    {
+        
+        subArgs = [NSArray arrayWithObjects:
+                   @"--texture-format", @"pvr2ccz",
+                   @"--max-width", @"2048",
+                   @"--max-height", @"2048",
+                   @"--size-constraints", @"NPOT",
+                   @"--opt", @"RGBA8888",
+                   @"--dither-none-nn",
+                   @"--pack-mode", @"Best",
+                   @"--scale-mode", @"Smooth",
+                   @"--algorithm", @"MaxRects",
+                   @"--maxrects-heuristics", @"Best",
+                   @"--border-padding", @"2",
+                   @"--shape-padding", @"2",
+                   @"--enable-rotation",
+                   @"--trim-mode", @"Trim",
+                   nil];
+        
+        
+        NSArray* array1 = [NSArray arrayWithObjects:
+                   @"--texture-format", @"pvr2ccz",
+                   @"--max-width", @"2048",
+                   @"--max-height", @"2048",
+                   @"--size-constraints", @"NPOT",
+                   @"--opt", @"RGBA8888",
+                   @"--dither-none-nn",
+                   @"--pack-mode", @"Best",
+                   @"--scale-mode", @"Smooth",
+                   @"--algorithm", @"MaxRects",
+                   @"--maxrects-heuristics", @"Best",
+                   @"--border-padding", @"2",
+                   @"--shape-padding", @"2",
+                   @"--enable-rotation",
+                   @"--trim-mode", @"Trim",
+                   nil];
+        
+        NSArray* array2 = [NSArray arrayWithObjects:
+                   @"--texture-format", @"pvr2ccz",
+                   @"--max-width", @"2048",
+                   @"--max-height", @"2048",
+                   @"--size-constraints", @"NPOT",
+                   @"--opt", @"RGBA8888",
+                   @"--dither-none-nn",
+                   @"--pack-mode", @"Best",
+                   @"--scale-mode", @"Smooth",
+                   @"--algorithm", @"MaxRects",
+                   @"--maxrects-heuristics", @"Best",
+                   @"--border-padding", @"2",
+                   @"--shape-padding", @"2",
+                   @"--enable-rotation",
+                   @"--trim-mode", @"Trim",
+                   nil];
+        
+        NSArray* array3 = [NSArray arrayWithObjects:
+                   @"--texture-format", @"pvr2ccz",
+                   @"--max-width", @"2048",
+                   @"--max-height", @"2048",
+                   @"--size-constraints", @"NPOT",
+                   @"--opt", @"RGBA8888",
+                   @"--dither-none-nn",
+                   @"--pack-mode", @"Best",
+                   @"--scale-mode", @"Smooth",
+                   @"--algorithm", @"MaxRects",
+                   @"--maxrects-heuristics", @"Best",
+                   @"--border-padding", @"2",
+                   @"--shape-padding", @"2",
+                   @"--enable-rotation",
+                   @"--trim-mode", @"Trim",
+                   nil];
+        
+        dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                array1, @"character",
+                array2, @"effect",
+                array3, @"ui",
+                nil];
+        
+        [dict writeToFile:filePath atomically:YES];
+        
+    }
+    else
+    {
+        //NSString* str = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+        //NSArray* tempArray = [str componentsSeparatedByString:@"#"];
+        //array = [NSArray arrayWithContentsOfFile:filePath];
+        
+        if ([spriteSheetFile rangeOfString:@"charactor"].location != NSNotFound)
+        {
+            subArgs = [dict objectForKey:@"character"];
+        }
+        else if ([spriteSheetFile rangeOfString:@"effect"].location != NSNotFound)
+        {
+            subArgs = [dict objectForKey:@"effect"];
+        }
+        else
+        {
+            subArgs = [dict objectForKey:@"ui"];
+        }
+    }
+    
+    
+    
     [args addObjectsFromArray:subArgs];
     if (scale) {
         NSString *scaleStr = [NSString stringWithFormat:@"%f", scale];
