@@ -118,8 +118,8 @@
 
 - (void) dealloc
 {
-    [super dealloc];
     [_files release];
+    [super dealloc];
 }
 
 @end
