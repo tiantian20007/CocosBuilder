@@ -1283,6 +1283,9 @@
                 publishForResolutions = [NSArray arrayWithObjects:deviceInfo.preferredResourceType, nil];
             }
             
+            // alwasy use this subfix for our project;
+            publishForResolutions = [NSArray arrayWithObjects:@"iphonehd", nil];
+            
             if (![self publishAllToDirectory:projectSettings.publishCacheDirectory]) return NO;
             
             // Zip up and push

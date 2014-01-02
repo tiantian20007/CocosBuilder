@@ -263,6 +263,7 @@ static PlayerConnection* sharedPlayerConnection;
         deviceInfo.populated = YES;
         
         NSLog(@"Connected device with UUID: %@", deviceInfo.uuid);
+        NSLog(@"%@", [deviceInfo description]);
         
         [delegate playerConnection:self updatedPlayerList:connectedServers];
         
