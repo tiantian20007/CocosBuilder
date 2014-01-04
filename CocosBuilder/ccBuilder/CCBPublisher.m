@@ -719,10 +719,28 @@
                    @"--trim-mode", @"Trim",
                    nil];
         
+        NSArray* array4 = [NSArray arrayWithObjects:
+                           @"--texture-format", @"pvr2ccz",
+                           @"--max-width", @"2048",
+                           @"--max-height", @"2048",
+                           @"--size-constraints", @"NPOT",
+                           @"--opt", @"RGBA8888",
+                           @"--dither-none-nn",
+                           @"--pack-mode", @"Best",
+                           @"--scale-mode", @"Smooth",
+                           @"--algorithm", @"MaxRects",
+                           @"--maxrects-heuristics", @"Best",
+                           @"--border-padding", @"2",
+                           @"--shape-padding", @"2",
+                           @"--enable-rotation",
+                           @"--trim-mode", @"Trim",
+                           nil];
+        
         dict = [NSDictionary dictionaryWithObjectsAndKeys:
                 array1, @"character",
                 array2, @"effect",
                 array3, @"ui",
+                array4, @"ui_scale",
                 nil];
         
         [dict writeToFile:filePath atomically:YES];
@@ -742,9 +760,13 @@
         {
             subArgs = [dict objectForKey:@"effect"];
         }
-        else
+        else if ([spriteSheetFile rangeOfString:@"ui"].location != NSNotFound)
         {
             subArgs = [dict objectForKey:@"ui"];
+        }
+        else if ([spriteSheetFile rangeOfString:@"ui_scale"].location != NSNotFound)
+        {
+            subArgs = [dict objectForKey:@"ui_scale"];
         }
     }
     
