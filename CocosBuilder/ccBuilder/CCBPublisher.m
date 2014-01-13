@@ -760,13 +760,13 @@
         {
             subArgs = [dict objectForKey:@"effect"];
         }
-        else if ([spriteSheetFile rangeOfString:@"ui"].location != NSNotFound)
-        {
-            subArgs = [dict objectForKey:@"ui"];
-        }
         else if ([spriteSheetFile rangeOfString:@"ui_scale"].location != NSNotFound)
         {
             subArgs = [dict objectForKey:@"ui_scale"];
+        }
+        else if ([spriteSheetFile rangeOfString:@"ui"].location != NSNotFound)
+        {
+            subArgs = [dict objectForKey:@"ui"];
         }
     }
     
