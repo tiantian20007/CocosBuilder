@@ -939,7 +939,8 @@
             [tmpl setStrings:jsFiles forMarker:@"REQUIRED_FILES" prefix:@"require(\"" suffix:@"\");\n"];
             [tmpl setString:projectSettings.javascriptMainCCB forMarker:@"MAIN_SCENE"];
             
-            [tmpl writeToFile:mainFile];
+            // don't publish main.js file, we do it on our onw
+            //[tmpl writeToFile:mainFile];
         }
     }
     else if (targetType == kCCBPublisherTargetTypeHTML5)
