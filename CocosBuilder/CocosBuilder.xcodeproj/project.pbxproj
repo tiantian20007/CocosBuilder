@@ -147,6 +147,7 @@
 		A09AB6F714E993AA009C8B91 /* fps_images.png in Resources */ = {isa = PBXBuildFile; fileRef = A09AB6F614E993AA009C8B91 /* fps_images.png */; };
 		A77EF590171FD30E00451DA4 /* cwebp in Resources */ = {isa = PBXBuildFile; fileRef = A77EF58F171FD30E00451DA4 /* cwebp */; };
 		A77EF594171FD3B200451DA4 /* cwebp in Resources */ = {isa = PBXBuildFile; fileRef = A77EF58F171FD30E00451DA4 /* cwebp */; };
+		E1AAE5B118811BC6006F5AB4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1AAE5B018811BC6006F5AB4 /* Images.xcassets */; };
 		E3127AA516C1D8E600D09AA4 /* CCBDirectoryComparer.m in Sources */ = {isa = PBXBuildFile; fileRef = E3127AA416C1D8E600D09AA4 /* CCBDirectoryComparer.m */; };
 		E312972E16CC33B200A09155 /* SequencerPopoverBlock.xib in Resources */ = {isa = PBXBuildFile; fileRef = E312972D16CC33B200A09155 /* SequencerPopoverBlock.xib */; };
 		E312973316CC377700A09155 /* SequencerPopoverBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = E312973216CC377700A09155 /* SequencerPopoverBlock.m */; };
@@ -1085,6 +1086,7 @@
 		A09AB6AE14E9935F009C8B91 /* vec4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vec4.c; sourceTree = "<group>"; };
 		A09AB6F614E993AA009C8B91 /* fps_images.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fps_images.png; path = "libs/cocos2d-iphone/Resources/Fonts/fps_images.png"; sourceTree = SOURCE_ROOT; };
 		A77EF58F171FD30E00451DA4 /* cwebp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cwebp; sourceTree = "<group>"; };
+		E1AAE5B018811BC6006F5AB4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CocosBuilder/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		E3127AA316C1D8E600D09AA4 /* CCBDirectoryComparer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCBDirectoryComparer.h; sourceTree = "<group>"; };
 		E3127AA416C1D8E600D09AA4 /* CCBDirectoryComparer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCBDirectoryComparer.m; sourceTree = "<group>"; };
 		E312972D16CC33B200A09155 /* SequencerPopoverBlock.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SequencerPopoverBlock.xib; sourceTree = "<group>"; };
@@ -2516,6 +2518,7 @@
 				E335CB071577C55F00A612EE /* Node info */,
 				776041E21498F5A70078095D /* Util */,
 				776041EE1498FC320078095D /* GUI Util */,
+				E1AAE5B018811BC6006F5AB4 /* Images.xcassets */,
 				7789ABC9133AA82000CEFCC7 /* Supporting Files */,
 			);
 			name = CocosBuilder;
@@ -4618,6 +4621,7 @@
 				E3DC1B8D154F18660087724C /* size-4.png in Resources */,
 				E334069715517225000FBD0B /* InspectorFloatScale.xib in Resources */,
 				E3799EA6155970F400196B4A /* ProjectSettingsWindow.xib in Resources */,
+				E1AAE5B118811BC6006F5AB4 /* Images.xcassets in Resources */,
 				E3DCFD9415627FAB00BD7D7F /* WarningsWindow.xib in Resources */,
 				E3DCFD9C15629FC700BD7D7F /* TaskStatusWindow.xib in Resources */,
 				E3BF89D9156D36B7001A24CE /* CocosBuilderProjectIcon.icns in Resources */,
@@ -5659,6 +5663,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5695,6 +5700,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (

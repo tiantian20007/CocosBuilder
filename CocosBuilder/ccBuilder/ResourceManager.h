@@ -40,6 +40,7 @@ enum
     kCCBResTypeCCBFile,
     kCCBResTypeJS,
     kCCBResTypeJSON,
+    kCCBResTypeEncrytedJson,
     kCCBResTypeAudio,
     kCCBResTypeGeneratedSpriteSheetDef,
 };

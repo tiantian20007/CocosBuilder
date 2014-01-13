@@ -57,7 +57,7 @@
     warnings = [w retain];
     
     // Setup extensions to copy
-    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg",@"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf",@"js", @"json", @"wav",@"mp3",@"m4a",@"caf",@"tmx",@"proto",@"atlas", nil];
+    copyExtensions = [[NSArray alloc] initWithObjects:@"jpg", @"png", @"pvr", @"ccz", @"plist", @"fnt", @"ttf", @"js", @"unity3d", @"json", @"wav", @"mp3", @"m4a", @"caf", @"tmx", @"proto", @"atlas", nil];
     
     // Set format to use for exports
     self.publishFormat = projectSettings.exporter;
@@ -427,6 +427,16 @@
             {                
                 // Skip non png files for generated sprite sheets
                 if (isGeneratedSpriteSheet && ![ext isEqualToString:@"png"]) continue;
+                
+                // Skip json files in data folder
+                if ([ext isEqualToString:@"json"] &&
+                    [dir rangeOfString:@"data"].location != NSNotFound &&
+                    [fileName rangeOfString:@"base"].location != NSNotFound &&
+                    [fileName rangeOfString:@"json"].location != NSNotFound)
+                {
+                    NSLog(@"don't copy %@", fileName);
+                    continue;
+                }
                 
                 if ([[fileName lowercaseString] hasSuffix:ext] && !projectSettings.onlyPublishCCBs)
                 {

@@ -379,7 +379,7 @@
         {
             [[CocosBuilderAppDelegate appDelegate] openFile: res.filePath];
         }
-        else if (res.type == kCCBResTypeJS || res.type == kCCBResTypeJSON)
+        else if (res.type == kCCBResTypeJS || res.type == kCCBResTypeJSON || res.type == kCCBResTypeEncrytedJson)
         {
             [[CocosBuilderAppDelegate appDelegate] openJSFile:res.filePath];
         }
